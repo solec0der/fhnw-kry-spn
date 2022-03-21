@@ -135,7 +135,7 @@ public class SPN {
     }
 
     
-    private static int applyBitPermutation(int input, int[] list){
+    public static int applyBitPermutation(int input, int[] list){
         int res=0;
         int mask=0b1000_0000_0000_0000;
         for (int i = 0; i < list.length; i++) {
