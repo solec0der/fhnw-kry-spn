@@ -44,23 +44,22 @@ public class SPN {
     public String encrypt(String plaintextMessage) {
         var chunks = splitStringIntoChunks(plaintextMessage, n * m);
 
-
-        var newChunks= new int[chunks.length];
+        var newChunks = new int[chunks.length];
 
         for (int i = 0; i < chunks.length; i++) {
-            var tempResult=chunks[i];
+            var tempResult = chunks[i];
             int initialRoundKey = roundKeys[0];
 
             tempResult ^= initialRoundKey;
 
             for (int j = 1; j < r - 1; j++) {
-                tempResult= applySBox(tempResult, this.sbox);
-                tempResult= applyBitPermutation(tempResult, this.bitPermutations);
+                tempResult = applySBox(tempResult, this.sbox);
+                tempResult = applyBitPermutation(tempResult, this.bitPermutations);
                 tempResult ^= roundKeys[j];
             }
-            tempResult= applySBox(tempResult, this.sbox);
-            tempResult ^= roundKeys[r-1];
-            newChunks[i]=tempResult;
+            tempResult = applySBox(tempResult, this.sbox);
+            tempResult ^= roundKeys[r - 1];
+            newChunks[i] = tempResult;
         }
         return mergeChunksIntoString(newChunks);
     }
@@ -69,9 +68,9 @@ public class SPN {
         return "decrypted message";
     }
 
-    public static String mergeChunksIntoString(int[] chunks){
-        var bytes=new byte[128];
-        var index=0;
+    public static String mergeChunksIntoString(int[] chunks) {
+        var bytes = new byte[128];
+        var index = 0;
         for (int chunk : chunks) {
             var b = BigInteger.valueOf(chunk).toByteArray();
             for (byte aByte : b) {
@@ -83,17 +82,12 @@ public class SPN {
 
     public static int[] splitStringIntoChunks(String input, int chunkSize) {
         var chunks = new int[input.length() / chunkSize];
-
-
-
-
-
-        var byteArray = input.getBytes(StandardCharsets.UTF_8);
+        var byteArray = extractBytesFromString(input);
 
         for (int i = 0; i < chunks.length; i++) {
             int chunk = 0;
-            for (int j = 0; j < 4; j++) {
-                chunk += byteArray[i * 4 + j];
+            for (int j = 0; j < 2; j++) {
+                chunk += byteArray[i * 2 + j];
             }
             chunks[i] = chunk;
         }
@@ -120,21 +114,20 @@ public class SPN {
         return res;
     }
 
-    private static int applySBox(int input, int[] box){
-        var mask=0b1111;
-        var res=0;
+    private static int applySBox(int input, int[] box) {
+        var mask = 0b1111;
+        var res = 0;
         for (int i = 0; i < 4; i++) {
             // Extrapolate 1 nimble and shift it to the last place
-            var key=(input & (mask >> i*4))>>3-i;
+            var key = (input & (mask >> i * 4)) >> 3 - i;
             // Get the box value
-            var newValue=box[key];
+            var newValue = box[key];
             // Store back the result found
-            res= res |(newValue<<3-i);
+            res = res | (newValue << 3 - i);
         }
         return res;
     }
 
-    
     public static int applyBitPermutation(int input, int[] list){
         int res=0;
         int mask=0b1000_0000_0000_0000;
@@ -156,5 +149,17 @@ public class SPN {
             res[sbox[i]] = i;
         }
         return res;
+    }
+
+    private static byte[] extractBytesFromString(String input) {
+        byte[] bytes = new byte[input.length() / 8];
+
+        for (int i = 0; i < input.length() / 8; i++) {
+            byte parsedInput = (byte) (Integer.parseInt(input.substring(i * 8, i * 8 + 8), 2) & 0xFF);
+
+            bytes[i] = parsedInput;
+        }
+
+        return bytes;
     }
 }

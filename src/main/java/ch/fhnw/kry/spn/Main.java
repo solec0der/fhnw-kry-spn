@@ -13,10 +13,13 @@ public class Main {
                 "111100011100111111101100000010100010100001110" +
                 "10000000010011011001110010101110110000";
 
+
         var chunks = SPN.splitStringIntoChunks(input, 16);
 
         for (int chunk : chunks) {
-            System.out.println(Integer.toBinaryString(chunk));
+            System.out.println(Integer.toBinaryString(chunk & 0xFF));
         }
     }
+
+
 }
