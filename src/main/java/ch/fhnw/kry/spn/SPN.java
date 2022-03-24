@@ -116,9 +116,13 @@ public class SPN {
                 var shift = BITS_IN_BYTE * (bytesPerChunk - j - 1);
                 var mask = 0xFF << (BITS_IN_BYTE * (bytesPerChunk - j - 1));
 
-                int index = Math.min(i * bytesPerChunk + j, bytes.length - 1);
+                int index = Math.min(i * bytesPerChunk + j, bytes.length);
 
-                chunk = chunk | ((bytes[index] << shift) & mask);
+                if (index < bytes.length) {
+                    chunk = chunk | ((bytes[index] << shift) & mask);
+                } else {
+                    chunk = chunk >> 8;
+                }
             }
 
             chunks[i] = chunk;
