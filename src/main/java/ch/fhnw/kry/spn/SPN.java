@@ -115,15 +115,18 @@ public class SPN {
     }
 
     public static int applySBox(int input, int[] box) {
-        var mask = 0b1111;
+        var mask = 0b1111_0000_0000_0000;
         var res = 0;
+        var in = Integer.toBinaryString(input);
+        var r = Integer.toBinaryString(res);
         for (int i = 0; i < 4; i++) {
             // Extrapolate 1 nimble and shift it to the last place
-            var key = (input & (mask >> i * 4)) >> 3 - i;
+            var key = (input & (mask >> i * 4)) >> ((3 - i) * 4);
             // Get the box value
             var newValue = box[key];
             // Store back the result found
-            res = res | (newValue << 3 - i);
+            res = res | (newValue << ((3 - i) * 4));
+            r = Integer.toBinaryString(res);
         }
         return res;
     }
@@ -131,15 +134,15 @@ public class SPN {
     public static int applyBitPermutation(int input, int[] list) {
         int res = 0;
         int mask = 0b1000_0000_0000_0000;
-        String r = Integer.toBinaryString(res);
-        String in = Integer.toBinaryString(input);
         for (int i = 0; i < list.length; i++) {
+            // Get goal bit pointer
             var shiftTo = (mask >> (list[i]));
+            // Is the origin bit 1 or 0
             var maskValue = (input & (mask >> i));
             if (maskValue > 0) {
+                // If the origin is 1, put to the goal a 1
                 res |= shiftTo & Integer.MAX_VALUE;
             }
-            r = Integer.toBinaryString(res);
         }
         return res;
     }
