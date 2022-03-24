@@ -114,7 +114,7 @@ public class SPN {
         return res;
     }
 
-    private static int applySBox(int input, int[] box) {
+    public static int applySBox(int input, int[] box) {
         var mask = 0b1111;
         var res = 0;
         for (int i = 0; i < 4; i++) {
@@ -128,11 +128,18 @@ public class SPN {
         return res;
     }
 
-    public static int applyBitPermutation(int input, int[] list){
-        int res=0;
-        int mask=0b1000_0000_0000_0000;
+    public static int applyBitPermutation(int input, int[] list) {
+        int res = 0;
+        int mask = 0b1000_0000_0000_0000;
+        String r = Integer.toBinaryString(res);
+        String in = Integer.toBinaryString(input);
         for (int i = 0; i < list.length; i++) {
-            res |= input & (mask >> (list[i]-1));
+            var shiftTo = (mask >> (list[i]));
+            var maskValue = (input & (mask >> i));
+            if (maskValue > 0) {
+                res |= shiftTo & Integer.MAX_VALUE;
+            }
+            r = Integer.toBinaryString(res);
         }
         return res;
     }
@@ -143,7 +150,7 @@ public class SPN {
      * @param sbox
      * @return
      */
-    private static int[] invertSBox(int[] sbox) {
+    public static int[] invertSBox(int[] sbox) {
         var res = new int[sbox.length];
         for (int i = 0; i < res.length; i++) {
             res[sbox[i]] = i;
