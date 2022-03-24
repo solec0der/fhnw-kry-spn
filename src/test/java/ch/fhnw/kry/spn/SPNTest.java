@@ -91,7 +91,66 @@ class SPNTest {
 
         SPN spn = new SPN(4, 4, 4, 32, 0b0011_1010_1001_0100_1101_0110_0011_1111, sbox, bitPermutations);
         var en = spn.encrypt(inputBin);
-        var res = spn.decrypt(spn.convertStringToBinary(en));
+        var res = spn.decrypt(SPN.convertStringToBinary(en));
+        assertEquals(input, res);
+    }
+
+    @Test
+    void testConvertStringToBinary() {
+        var input = "Hello there";
+        var inputBin = "0100100001100101011011000110110001101111001000000111010001101000011001010111001001100101";
+        var res = SPN.convertStringToBinary(input);
+        assertEquals(inputBin, res);
+    }
+
+    @Test
+    void testApplySboxAndRevert() {
+        int[] sbox = new int[]{0xE, 0x4, 0xD, 0x1, 0x2, 0xF, 0xB, 0x8, 0x3, 0xA, 0x6, 0xC, 0x5, 0x9, 0x0, 0x7};
+        int input = 0x73;
+        var b = SPN.applySBox(input, sbox);
+        var res = SPN.applySBox(b, SPN.invertSBox(sbox));
+        assertEquals(input, res);
+    }
+
+    @Test
+    void testApplyPermutationAndRevert() {
+        int[] perm = {0x0F, 0x0E, 0x0D, 0x0C, 0x0B, 0x0A, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00};
+        int input = 0x73;
+        var b = SPN.applyBitPermutation(input, perm);
+        var res = SPN.applyBitPermutation(b, perm);
+        assertEquals(input, res);
+    }
+
+    @Test
+    void testEnDe() {
+        var input = "Hello there";
+        var inputBin = "0100100001100101011011000110110001101111001000000111010001101000011001010111001001100101";
+        int[] sbox = {0xE, 0x4, 0xD, 0x1, 0x2, 0xF, 0xB, 0x8, 0x3, 0xA, 0x6, 0xC, 0x5, 0x9, 0x0, 0x7};
+        int[] bitPermutations = {0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15};
+
+        SPN spn = new SPN(4, 4, 4, 32, 0b0011_1010_1001_0100_1101_0110_0011_1111, sbox, bitPermutations);
+        var res = spn.enDe(inputBin);
+        assertEquals(input, res);
+    }
+
+    @Test
+    void testBitPerm1() {
+        int[] sbox = {0xE, 0x4, 0xD, 0x1, 0x2, 0xF, 0xB, 0x8, 0x3, 0xA, 0x6, 0xC, 0x5, 0x9, 0x0, 0x7};
+        int[] bitPermutations = {0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15};
+        var input = 0b100100001100101;
+        var res = SPN.applySBox(input, sbox);
+        res = SPN.applyBitPermutation(res, bitPermutations);
+        var a = Integer.toBinaryString(res);
+        res = SPN.applySBox(res, sbox);
+        res = SPN.applyBitPermutation(res, bitPermutations);
+        res = SPN.applyBitPermutation(res, bitPermutations);
+        var b = Integer.toBinaryString(res);
+        res = SPN.applySBox(res, SPN.invertSBox(sbox));
+        var c = Integer.toBinaryString(res);
+        res = SPN.applyBitPermutation(res, bitPermutations);
+        res = SPN.applySBox(res, SPN.invertSBox(sbox));
+        var d = Integer.toBinaryString(res);
+
         assertEquals(input, res);
     }
 }

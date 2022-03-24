@@ -47,7 +47,7 @@ public class SPN {
     public String encrypt(String plaintextMessage) {
         var chunks = splitStringIntoChunks(plaintextMessage, n * m);
 
-        var newChunks = new int[chunks.length];
+        var encrypted = new int[chunks.length];
 
         for (int i = 0; i < chunks.length; i++) {
             var tempResult = chunks[i];
@@ -60,18 +60,18 @@ public class SPN {
             }
             tempResult = applySBox(tempResult, this.sbox);
             tempResult ^= roundKeys[r - 1];
-            newChunks[i] = tempResult;
+            encrypted[i] = tempResult & 0xFFFF;
         }
-        return mergeChunksIntoString(newChunks);
+        return mergeChunksIntoString(encrypted);
     }
 
     public String decrypt(String encryptedMessage) {
-        var chunks = splitStringIntoChunks(encryptedMessage, n * m);
+        var encrypted = splitStringIntoChunks(encryptedMessage, n * m);
 
-        var newChunks = new int[chunks.length];
+        var decrypted = new int[encrypted.length];
 
-        for (int i = 0; i < chunks.length; i++) {
-            var tempResult = chunks[i];
+        for (int i = 0; i < encrypted.length; i++) {
+            var tempResult = encrypted[i];
             tempResult ^= roundKeys[r - 1];
             tempResult = applySBox(tempResult, this.invertedSBox);
 
@@ -81,9 +81,46 @@ public class SPN {
                 tempResult = applySBox(tempResult, this.invertedSBox);
             }
             tempResult ^= roundKeys[0];
-            newChunks[i] = tempResult;
+            decrypted[i] = tempResult & 0xFFFF;
         }
-        return mergeChunksIntoString(newChunks);
+        return mergeChunksIntoString(decrypted);
+    }
+
+    public String enDe(String plaintextMessage){
+        var chunks = splitStringIntoChunks(plaintextMessage, n * m);
+
+        var encripted = new int[chunks.length];
+
+        for (int i = 0; i < chunks.length; i++) {
+            var tempResult = chunks[i];
+            tempResult ^= roundKeys[0];
+
+            for (int j = 1; j < r - 1; j++) {
+                tempResult = applySBox(tempResult, this.sbox);
+                tempResult = applyBitPermutation(tempResult, this.bitPermutations);
+                tempResult ^= roundKeys[j];
+            }
+            tempResult = applySBox(tempResult, this.sbox);
+            tempResult ^= roundKeys[r - 1];
+            encripted[i] = tempResult & 0xFFFF;
+        }
+
+        var decripted = new int[chunks.length];
+
+        for (int i = 0; i < encripted.length; i++) {
+            var tempResult = encripted[i];
+            tempResult ^= roundKeys[r - 1];
+            tempResult = applySBox(tempResult, this.invertedSBox);
+
+            for (int j = r - 2; j > 0; j--) {
+                tempResult ^= roundKeys[j];
+                tempResult = applyBitPermutation(tempResult, this.bitPermutations);
+                tempResult = applySBox(tempResult, this.invertedSBox);
+            }
+            tempResult ^= roundKeys[0];
+            decripted[i] = tempResult & 0xFFFF;
+        }
+        return mergeChunksIntoString(decripted);
     }
 
     public static String mergeChunksIntoString(int[] chunks) {
@@ -156,7 +193,7 @@ public class SPN {
         var res = 0;
         for (int i = 0; i < 4; i++) {
             // Extrapolate 1 nimble and shift it to the last place
-            var key = (input & (mask >> i * 4)) >> ((3 - i) * 4);
+            var key = (input & (mask >>> i * 4)) >>> ((3 - i) * 4);
             // Get the box value
             var newValue = box[key];
             // Store back the result found
@@ -170,9 +207,9 @@ public class SPN {
         int mask = 0b1000_0000_0000_0000;
         for (int i = 0; i < list.length; i++) {
             // Get goal bit pointer
-            var shiftTo = (mask >> (list[i]));
+            var shiftTo = (mask >>> (list[i]));
             // Is the origin bit 1 or 0
-            var maskValue = (input & (mask >> i));
+            var maskValue = (input & (mask >>> i));
             if (maskValue > 0) {
                 // If the origin is 1, put to the goal a 1
                 res |= shiftTo & Integer.MAX_VALUE;
