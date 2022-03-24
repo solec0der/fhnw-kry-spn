@@ -91,8 +91,7 @@ class SPNTest {
 
         SPN spn = new SPN(4, 4, 4, 32, 0b0011_1010_1001_0100_1101_0110_0011_1111, sbox, bitPermutations);
         var en = spn.encrypt(inputBin);
-<<<<<<< Updated upstream
-        var res = spn.decrypt(SPN.convertStringToBinary(en));
+        var res = spn.decrypt(StringUtil.convertStringToBinary(en));
         assertEquals(input, res);
     }
 
@@ -100,7 +99,7 @@ class SPNTest {
     void testConvertStringToBinary() {
         var input = "Hello there";
         var inputBin = "0100100001100101011011000110110001101111001000000111010001101000011001010111001001100101";
-        var res = SPN.convertStringToBinary(input);
+        var res = StringUtil.convertStringToBinary(input);
         assertEquals(inputBin, res);
     }
 
@@ -152,9 +151,6 @@ class SPNTest {
         res = SPN.applySBox(res, SPN.invertSBox(sbox));
         var d = Integer.toBinaryString(res);
 
-=======
-        var res = spn.decrypt(StringUtil.convertStringToBinary(en));
->>>>>>> Stashed changes
         assertEquals(input, res);
     }
 }
