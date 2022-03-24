@@ -12,26 +12,5 @@ public class Main {
         String input = "000001001101001000001011101110000000001010001" +
                 "111100011100111111101100000010100010100001110" +
                 "10000000010011011001110010101110110000";
-
-
-        var chunks = SPN.splitStringIntoChunks(input, 16);
-
-        for (int chunk : chunks) {
-            System.out.println(padLeftZeros(Integer.toBinaryString(chunk & 0xFFFF), 16));
-        }
     }
-
-    public static String padLeftZeros(String inputString, int length) {
-        if (inputString.length() >= length) {
-            return inputString;
-        }
-        StringBuilder sb = new StringBuilder();
-        while (sb.length() < length - inputString.length()) {
-            sb.append('0');
-        }
-        sb.append(inputString);
-
-        return sb.toString();
-    }
-
 }
