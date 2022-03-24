@@ -102,12 +102,14 @@ public class SPN {
     }
 
     public static int[] splitStringIntoChunks(String input, int chunkSize) {
-        var chunks = new int[input.length() / chunkSize];
+        var inputLength = input.length() + input.length() % chunkSize;
+
+        var chunks = new int[inputLength / chunkSize];
         var bytes = extractBytesFromString(input);
 
         var bytesPerChunk = chunkSize / BITS_IN_BYTE;
 
-        for (int i = 0; i < bytes.length / bytesPerChunk; i++) {
+        for (int i = 0; i <= (bytes.length / bytesPerChunk); i++) {
             var chunk = 0;
 
             for (int j = 0; j < bytesPerChunk; j++) {
