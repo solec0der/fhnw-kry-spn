@@ -117,8 +117,6 @@ public class SPN {
     public static int applySBox(int input, int[] box) {
         var mask = 0b1111_0000_0000_0000;
         var res = 0;
-        var in = Integer.toBinaryString(input);
-        var r = Integer.toBinaryString(res);
         for (int i = 0; i < 4; i++) {
             // Extrapolate 1 nimble and shift it to the last place
             var key = (input & (mask >> i * 4)) >> ((3 - i) * 4);
@@ -126,7 +124,6 @@ public class SPN {
             var newValue = box[key];
             // Store back the result found
             res = res | (newValue << ((3 - i) * 4));
-            r = Integer.toBinaryString(res);
         }
         return res;
     }
