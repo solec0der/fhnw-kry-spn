@@ -102,14 +102,16 @@ public class SPN {
      * @param r
      * @return
      */
-    private static int[] getRoundKeys(int k, int r) {
+    public static int[] getRoundKeys(long k, int r) {
         // The length of the key must not be larger than 8 nimble
-        assert k <= 0xFFFFFFFF;
+        assert k <= 0xFFFFFFFFL;
         var res = new int[r];
-        // Define the mask as 4 pairs of nimbles
-        var mask = 0xFFFF;
+        // Define the mask as 4 pairs of nimble
+        var mask = 0xFFFF0000;
         for (int i = 0; i < r; i++) {
-            res[i] = k & (mask >> i * 4);
+            var position = (mask >>> i * 4);
+            var chunk = (((int) k) & position);
+            res[i] = chunk >> ((r - i - 1) * 4);
         }
         return res;
     }

@@ -38,4 +38,19 @@ class SPNTest {
         var restore = SPN.invertSBox(inv);
         assertArrayEquals(box, restore);
     }
+
+    @Test
+    void testGetRoundKeys() {
+        int k = 0b0001_1010_1111_1100_0000_0011_0101_0000;
+        var expected = new int[]{
+                0b0001_1010_1111_1100,
+                0b1010_1111_1100_0000,
+                0b1111_1100_0000_0011,
+                0b1100_0000_0011_0101,
+                0b0000_0011_0101_0000,
+        };
+
+        var res = SPN.getRoundKeys(k, 5);
+        assertArrayEquals(expected, res);
+    }
 }
