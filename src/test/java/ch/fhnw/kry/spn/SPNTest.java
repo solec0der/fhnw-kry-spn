@@ -77,7 +77,7 @@ class SPNTest {
     @Test
     void testSplitAndMergeChunks() {
         var input = "Hello there";
-        var r1 = SPN.splitStringIntoChunks(SPN.convertStringToBinary(input), 16);
+        var r1 = StringUtil.splitStringIntoChunks(StringUtil.convertStringToBinary(input), 16);
         var result = SPN.mergeChunksIntoString(r1);
         assertEquals(input, result);
     }
@@ -91,6 +91,7 @@ class SPNTest {
 
         SPN spn = new SPN(4, 4, 4, 32, 0b0011_1010_1001_0100_1101_0110_0011_1111, sbox, bitPermutations);
         var en = spn.encrypt(inputBin);
+<<<<<<< Updated upstream
         var res = spn.decrypt(SPN.convertStringToBinary(en));
         assertEquals(input, res);
     }
@@ -151,6 +152,9 @@ class SPNTest {
         res = SPN.applySBox(res, SPN.invertSBox(sbox));
         var d = Integer.toBinaryString(res);
 
+=======
+        var res = spn.decrypt(StringUtil.convertStringToBinary(en));
+>>>>>>> Stashed changes
         assertEquals(input, res);
     }
 }
