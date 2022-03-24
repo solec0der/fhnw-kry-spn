@@ -17,9 +17,21 @@ public class Main {
         var chunks = SPN.splitStringIntoChunks(input, 16);
 
         for (int chunk : chunks) {
-            System.out.println(Integer.toBinaryString(chunk & 0xFF));
+            System.out.println(padLeftZeros(Integer.toBinaryString(chunk & 0xFFFF), 16));
         }
     }
 
+    public static String padLeftZeros(String inputString, int length) {
+        if (inputString.length() >= length) {
+            return inputString;
+        }
+        StringBuilder sb = new StringBuilder();
+        while (sb.length() < length - inputString.length()) {
+            sb.append('0');
+        }
+        sb.append(inputString);
+
+        return sb.toString();
+    }
 
 }

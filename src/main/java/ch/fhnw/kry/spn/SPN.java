@@ -2,6 +2,7 @@ package ch.fhnw.kry.spn;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class SPN {
 
@@ -16,6 +17,8 @@ public class SPN {
     private final int[] bitPermutations;
 
     private final int[] roundKeys;
+
+    private static final int BITS_IN_BYTE = 8;
 
     /**
      * Initializes the SPN Decryptor with the necessary parameters
@@ -97,16 +100,24 @@ public class SPN {
 
     public static int[] splitStringIntoChunks(String input, int chunkSize) {
         var chunks = new int[input.length() / chunkSize];
-        var byteArray = extractBytesFromString(input);
+        var bytes = extractBytesFromString(input);
 
-        for (int i = 0; i < chunks.length; i++) {
-            int chunk = 0;
-            for (int j = 0; j < 2; j++) {
-                chunk += byteArray[i * 2 + j];
+        var bytesPerChunk = chunkSize / BITS_IN_BYTE;
+
+        for (int i = 0; i < bytes.length / bytesPerChunk; i++) {
+            var chunk = 0;
+
+            for (int j = 0; j < bytesPerChunk; j++) {
+                var shift = BITS_IN_BYTE * (bytesPerChunk - j - 1);
+                var mask = 0xFF << (BITS_IN_BYTE * (bytesPerChunk - j - 1));
+
+                int index = Math.min(i * bytesPerChunk + j, bytes.length - 1);
+
+                chunk = chunk | ((bytes[index] << shift) & mask);
             }
+
             chunks[i] = chunk;
         }
-
         return chunks;
     }
 
