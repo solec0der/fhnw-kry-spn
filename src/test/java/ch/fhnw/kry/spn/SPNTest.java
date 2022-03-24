@@ -53,4 +53,31 @@ class SPNTest {
         var res = SPN.getRoundKeys(k, 5);
         assertArrayEquals(expected, res);
     }
+
+    @Test
+    void testMergeChunksIntoStringOdd() {
+        var exp = "Hello";
+        var chunks = new int[]{
+                0b0100_1000, 0b0110_0101_0110_1100, 0b0110_1100_0110_1111
+        };
+        var result = SPN.mergeChunksIntoString(chunks);
+        assertEquals(exp, result);
+    }
+    @Test
+    void testMergeChunksIntoStringEven() {
+        var exp = ".Hello";
+        var chunks = new int[]{
+                0b0010_1110_0100_1000, 0b0110_0101_0110_1100, 0b0110_1100_0110_1111
+        };
+        var result = SPN.mergeChunksIntoString(chunks);
+        assertEquals(exp, result);
+    }
+
+    @Test
+    void testSplitAndMergeChunks() {
+        var input = "Hello there";
+        var r1 = SPN.splitStringIntoChunks(input, 4);
+        var result = SPN.mergeChunksIntoString(r1);
+        assertEquals(input, result);
+    }
 }

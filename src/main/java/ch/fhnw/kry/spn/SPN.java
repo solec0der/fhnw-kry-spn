@@ -2,6 +2,7 @@ package ch.fhnw.kry.spn;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class SPN {
 
@@ -84,7 +85,7 @@ public class SPN {
     }
 
     public static String mergeChunksIntoString(int[] chunks) {
-        var bytes = new byte[128];
+        var bytes = new byte[chunks.length * 2];
         var index = 0;
         for (int chunk : chunks) {
             var b = BigInteger.valueOf(chunk).toByteArray();
@@ -92,7 +93,10 @@ public class SPN {
                 bytes[index++] = aByte;
             }
         }
-        return new String(bytes, StandardCharsets.UTF_8);
+        var res = new byte[index];
+        // If the amount of nimble is even, there is one nimble too much with value 0 at the end.
+        System.arraycopy(bytes, 0, res, 0, index);
+        return new String(res, StandardCharsets.UTF_8);
     }
 
     public static int[] splitStringIntoChunks(String input, int chunkSize) {
