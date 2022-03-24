@@ -87,7 +87,7 @@ public class SPN {
     }
 
     public static String mergeChunksIntoString(int[] chunks) {
-        var bytes = new byte[chunks.length * 2];
+        var bytes = new byte[128];
         var index = 0;
         for (int chunk : chunks) {
             var b = BigInteger.valueOf(chunk).toByteArray();
@@ -199,5 +199,18 @@ public class SPN {
         }
 
         return bytes;
+    }
+    public static String convertStringToBinary(String input) {
+
+        StringBuilder result = new StringBuilder();
+        char[] chars = input.toCharArray();
+        for (char aChar : chars) {
+            result.append(
+                    String.format("%8s", Integer.toBinaryString(aChar))   // char -> int, auto-cast
+                            .replaceAll(" ", "0")                         // zero pads
+            );
+        }
+        return result.toString();
+
     }
 }
