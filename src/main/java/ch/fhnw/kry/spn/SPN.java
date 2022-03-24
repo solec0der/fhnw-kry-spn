@@ -48,9 +48,7 @@ public class SPN {
 
         for (int i = 0; i < chunks.length; i++) {
             var tempResult = chunks[i];
-            int initialRoundKey = roundKeys[0];
-
-            tempResult ^= initialRoundKey;
+            tempResult ^= roundKeys[0];
 
             for (int j = 1; j < r - 1; j++) {
                 tempResult = applySBox(tempResult, this.sbox);
@@ -65,7 +63,24 @@ public class SPN {
     }
 
     public String decrypt(String encryptedMessage) {
-        return "decrypted message";
+        var chunks = splitStringIntoChunks(encryptedMessage, n * m);
+
+        var newChunks = new int[chunks.length];
+
+        for (int i = 0; i < chunks.length; i++) {
+            var tempResult = chunks[i];
+            tempResult ^= roundKeys[r - 1];
+            tempResult = applySBox(tempResult, this.invertedSBox);
+
+            for (int j = r - 2; j > 0; j--) {
+                tempResult ^= roundKeys[j];
+                tempResult = applyBitPermutation(tempResult, this.bitPermutations);
+                tempResult = applySBox(tempResult, this.invertedSBox);
+            }
+            tempResult ^= roundKeys[0];
+            newChunks[i] = tempResult;
+        }
+        return mergeChunksIntoString(newChunks);
     }
 
     public static String mergeChunksIntoString(int[] chunks) {
